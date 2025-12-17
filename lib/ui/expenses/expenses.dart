@@ -39,8 +39,31 @@ class _ExpensesViewState extends State<ExpensesView> {
         Expanded(
           child: ListView.builder(
             itemCount: allExpenses.length,
-            itemBuilder: (context, index) =>
-                ExpenseItem(expense: allExpenses[index]),
+            itemBuilder: (context, index) {
+              final expense = allExpenses[index];
+              return Dismissible(
+                key: Key(expense.title + expense.date.toString()),
+                onDismissed: (direction) {
+                  setState(() {
+                    _expense.remove(expense);
+                  });
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('${expense.title} dismissed'),
+                      action: SnackBarAction(
+                        label: 'Undo',
+                        onPressed: () {
+                          setState(() {
+                            _expense.add(expense);
+                          });
+                        },
+                      ),
+                    ),
+                  );
+                },
+                child: ExpenseItem(expense: expense),
+              );
+            },
           ),
         ),
       ],
@@ -64,10 +87,6 @@ class ExpenseItem extends StatelessWidget {
       case Category.work:
         return Icons.work;
     }
-  }
-
-  String get expenseDate {
-    return "11/54/25";
   }
 
   @override
@@ -96,7 +115,9 @@ class ExpenseItem extends StatelessWidget {
                     padding: const EdgeInsets.all(10.0),
                     child: Icon(expenseIcon),
                   ),
-                  Text(expenseDate),
+                  Text(
+                    '${expense.date.day}/${expense.date.month}/${expense.date.year}',
+                  ),
                 ],
               ),
             ],

@@ -1,5 +1,3 @@
-import 'package:datepicker_dropdown/datepicker_dropdown.dart';
-import 'package:datepicker_dropdown/order_format.dart';
 import 'package:expenses_application/models/expense.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -16,12 +14,25 @@ class ExpenseForm extends StatefulWidget {
 class _ExpenseFormState extends State<ExpenseForm> {
   final _titleController = TextEditingController();
   final _amountController = TextEditingController();
-  DateTime selectedDate = DateTime.now();
+  DateTime? selectedDate;
   Category selectedCategory = Category.food;
 
   bool isSuccess = true;
 
   List<Expense> expense = [];
+
+  Future<void> _selectedDate() async {
+    final DateTime? pickedDate = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime.now().subtract(const Duration(days: 365)),
+      lastDate: DateTime.now(),
+    );
+
+    setState(() {
+      selectedDate = pickedDate;
+    });
+  }
 
   @override
   void dispose() {
@@ -30,7 +41,9 @@ class _ExpenseFormState extends State<ExpenseForm> {
   }
 
   void onSubmit() {
-    if (_titleController.text.isEmpty || _amountController.text.isEmpty) {
+    if (_titleController.text.isEmpty ||
+        _amountController.text.isEmpty ||
+        selectedDate == null) {
       showDialog(
         context: context,
         builder: (BuildContext context) => AlertDialog(
@@ -49,11 +62,11 @@ class _ExpenseFormState extends State<ExpenseForm> {
       final newExpense = Expense(
         title: _titleController.text,
         amount: double.parse(_amountController.text),
-        date: selectedDate,
+        date: selectedDate!,
         category: selectedCategory,
       );
       widget.onCreate(newExpense);
-      
+
       showDialog(
         context: context,
         builder: (BuildContext context) => AlertDialog(
@@ -66,7 +79,7 @@ class _ExpenseFormState extends State<ExpenseForm> {
                 Navigator.pop(context);
               },
               child: Text("Ronan The Best"),
-            )
+            ),
           ],
         ),
       );
@@ -117,37 +130,20 @@ class _ExpenseFormState extends State<ExpenseForm> {
               ),
             ],
           ),
+          SizedBox(height: 30),
+          Column(
+            mainAxisSize: MainAxisSize.min,
+            spacing: 10,
+            children: <Widget>[
+              Text(
+                selectedDate != null
+                    ? '${selectedDate!.day}/${selectedDate!.month}/${selectedDate!.year}'
+                    : 'Please pick a date',
+              ),
+              ElevatedButton(onPressed: _selectedDate, child: Text("Select Date")),
+            ],
+          ),
           SizedBox(height: 10),
-          DropdownDatePicker(
-              dateformatorder: OrderFormat.ydm, // default is myd
-              inputDecoration: InputDecoration(
-                  enabledBorder: const OutlineInputBorder(
-                    borderSide: BorderSide(color: Colors.grey, width: 1.0),
-                  ),
-                  border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10))), // optional
-              isDropdownHideUnderline: true, // optional
-              isFormValidator: true, // optional
-              startYear: 1900, // optional
-              endYear: 2020, // optional
-              width: 10, // optional
-              // selectedDay: 14, // optional
-              // selectedMonth: 10, // optional
-              // selectedYear: 1993, // optional
-              onChangedDay: (value) => print('onChangedDay: $value'),
-              onChangedMonth: (value) => print('onChangedMonth: $value'),
-              onChangedYear: (value) => print('onChangedYear: $value'),
-              //boxDecoration: BoxDecoration(
-              // border: Border.all(color: Colors.grey, width: 1.0)), // optional
-              // showDay: false,// optional
-              dayFlex: 2,// optional
-              // locale: "zh_CN",// optional
-              // hintDay: 'Day', // optional
-              // hintMonth: 'Month', // optional
-              // hintYear: 'Year', // optional
-              // hintTextStyle: TextStyle(color: Colors.grey), // optional
-            ),
-          SizedBox(height: 10,),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
