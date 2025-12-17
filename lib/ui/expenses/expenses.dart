@@ -1,3 +1,4 @@
+import 'package:expenses_application/ui/expenses/expense_statistic.dart';
 import 'package:flutter/material.dart';
 import '../../models/expense.dart';
 
@@ -13,7 +14,7 @@ class ExpensesView extends StatefulWidget {
 }
 
 class _ExpensesViewState extends State<ExpensesView> {
-  final List<Expense> _expenses = [
+  final List<Expense> _expense = [
     Expense(
       title: 'Flutter Course',
       amount: 19.99,
@@ -27,12 +28,22 @@ class _ExpensesViewState extends State<ExpensesView> {
       category: Category.leisure,
     ),
   ];
-  
+
   @override
   Widget build(BuildContext context) {
-    return ListView.builder(
-      itemCount: _expenses.length,
-      itemBuilder: (context, index) => ExpenseItem(expense: _expenses[index]),
+    final allExpenses = [..._expense, ...widget.expenses];
+
+    return Column(
+      children: [
+        ExpenseStatistic(expenses: allExpenses),
+        Expanded(
+          child: ListView.builder(
+            itemCount: allExpenses.length,
+            itemBuilder: (context, index) =>
+                ExpenseItem(expense: allExpenses[index]),
+          ),
+        ),
+      ],
     );
   }
 }
@@ -79,10 +90,15 @@ class ExpenseItem extends StatelessWidget {
                 ],
               ),
               Spacer(),
-              Row(children: [Padding(
-                padding: const EdgeInsets.all(10.0),
-                child: Icon(expenseIcon),
-              ), Text(expenseDate)]),
+              Row(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(10.0),
+                    child: Icon(expenseIcon),
+                  ),
+                  Text(expenseDate),
+                ],
+              ),
             ],
           ),
         ),

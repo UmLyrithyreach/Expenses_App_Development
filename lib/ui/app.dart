@@ -25,7 +25,7 @@ class _AppState extends State<App> {
       isScrollControlled: false,
       context: context,
       builder: (c) => ExpenseForm(
-        onCreate: _addExpense,  // ← send callback
+        onCreate: _addExpense,
       ),
     );
   }
@@ -44,7 +44,13 @@ class _AppState extends State<App> {
         backgroundColor: Colors.blue[700],
         title: const Text('Ronan-The-Best Expenses App'),
       ),
-      body: ExpensesView(expenses: expenses),
+      body: Column(
+        children: [
+          Expanded(
+            child: ExpensesView(expenses: expenses),
+          ),
+        ],
+      ),
     );
   }
 }
